@@ -24,6 +24,10 @@ export const requestClaimSignature = async (
   try {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     
+    // Debug: Log the Supabase URL to console
+    console.log('Supabase URL from env:', supabaseUrl);
+    console.log('All env vars:', import.meta.env);
+    
     if (!supabaseUrl) {
       throw new Error('Supabase URL not configured');
     }
