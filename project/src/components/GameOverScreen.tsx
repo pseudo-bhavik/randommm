@@ -22,10 +22,13 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
   onPlayAgain,
 }) => {
   const [isClaimingTokens, setIsClaimingTokens] = useState(false);
+  const [isRequestingSignature, setIsRequestingSignature] = useState(false);
+  const [isInitiatingTransaction, setIsInitiatingTransaction] = useState(false);
   const [tokensClaimed, setTokensClaimed] = useState(false);
   const [isConnectingWallet, setIsConnectingWallet] = useState(false);
   const [claimError, setClaimError] = useState<string | null>(null);
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
+  const [signatureData, setSignatureData] = useState<{signature: string, amount: string} | null>(null);
   
   const { connect, connectors, isPending: isConnectPending } = useConnect();
   const { isConnected, address } = useAccount();
@@ -43,12 +46,52 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
   // Generate a unique game session ID for this claim
   const gameSessionId = React.useMemo(() => generateGameSessionId(), []);
   
+  // Pre-load signature when wallet is connected and conditions are met
+  React.useEffect(() => {
+    const preloadSignature = async () => {
+      if (
+        isConnected && 
+        address && 
+        !hasReachedDailyLimit && 
+        totalTokens > 0 && 
+        !signatureData && 
+        !tokensClaimed &&
+        !isRequestingSignature
+      ) {
+        setIsRequestingSignature(true);
+        try {
+          const signatureResponse = await requestClaimSignature(
+            address,
+            score,
+            multiplier,
+            gameSessionId
+          );
+          
+          if (signatureResponse.success && signatureResponse.signature) {
+            setSignatureData({
+              signature: signatureResponse.signature,
+              amount: signatureResponse.amount!
+            });
+          }
+        } catch (error) {
+          console.error('Error pre-loading signature:', error);
+          // Don't set error state here, let user try manually
+        } finally {
+          setIsRequestingSignature(false);
+        }
+      }
+    };
+
+    preloadSignature();
+  }, [isConnected, address, hasReachedDailyLimit, totalTokens, signatureData, tokensClaimed, score, multiplier, gameSessionId, isRequestingSignature]);
+
   // Watch for transaction confirmation
   React.useEffect(() => {
     if (isConfirmed && hash) {
       setTokensClaimed(true);
       setTransactionHash(hash);
       setIsClaimingTokens(false);
+      setIsInitiatingTransaction(false);
     }
   }, [isConfirmed, hash]);
   
@@ -57,6 +100,7 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
     if (contractError) {
       setClaimError(contractError.message || 'Transaction failed');
       setIsClaimingTokens(false);
+      setIsInitiatingTransaction(false);
     }
   }, [contractError]);
   
@@ -100,26 +144,38 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
     setIsClaimingTokens(true);
     
     try {
-      // Step 1: Request signature from backend
-      const signatureResponse = await requestClaimSignature(
-        address!,
-        score,
-        multiplier,
-        gameSessionId
-      );
+      let currentSignatureData = signatureData;
       
-      if (!signatureResponse.success || !signatureResponse.signature) {
-        throw new Error(signatureResponse.error || 'Failed to get signature from server');
+      // If we don't have pre-loaded signature data, request it now
+      if (!currentSignatureData) {
+        setIsRequestingSignature(true);
+        const signatureResponse = await requestClaimSignature(
+          address!,
+          score,
+          multiplier,
+          gameSessionId
+        );
+        
+        if (!signatureResponse.success || !signatureResponse.signature) {
+          throw new Error(signatureResponse.error || 'Failed to get signature from server');
+        }
+        
+        currentSignatureData = {
+          signature: signatureResponse.signature,
+          amount: signatureResponse.amount!
+        };
+        setIsRequestingSignature(false);
       }
       
       // Step 2: Call smart contract with the signature
+      setIsInitiatingTransaction(true);
       await claimReward({
         playerAddress: address!,
-        amount: BigInt(signatureResponse.amount!),
+        amount: BigInt(currentSignatureData.amount),
         score,
         multiplier,
         gameSessionId,
-        signature: signatureResponse.signature as `0x${string}`,
+        signature: currentSignatureData.signature as `0x${string}`,
       });
       
       // Transaction is now pending, waiting for confirmation...
@@ -129,6 +185,8 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
       console.error('Error claiming tokens:', error);
       setClaimError(error instanceof Error ? error.message : 'Failed to claim tokens');
       setIsClaimingTokens(false);
+      setIsRequestingSignature(false);
+      setIsInitiatingTransaction(false);
     }
   };
 
@@ -221,7 +279,7 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
             
             <button
               onClick={handleClaimTokens}
-              disabled={isClaimingTokens || isConnectingWallet || totalTokens === 0 || hasReachedDailyLimit || isContractPending || isConfirming}
+              disabled={isClaimingTokens || isConnectingWallet || totalTokens === 0 || hasReachedDailyLimit || isContractPending || isConfirming || isRequestingSignature}
               className="w-full bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:scale-100 disabled:cursor-not-allowed"
             >
               {isConnectingWallet ? (
@@ -229,10 +287,15 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                   <span>Connecting Wallet...</span>
                 </div>
-              ) : isClaimingTokens || isContractPending ? (
+              ) : isRequestingSignature ? (
                 <div className="flex items-center justify-center space-x-2">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  <span>Signing Transaction...</span>
+                  <span>Preparing Transaction...</span>
+                </div>
+              ) : isInitiatingTransaction || isContractPending ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>Initiating Transaction...</span>
                 </div>
               ) : isConfirming ? (
                 <div className="flex items-center justify-center space-x-2">
@@ -251,10 +314,29 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
               ) : (
                 <div className="flex items-center justify-center space-x-2">
                   <ExternalLink className="w-5 h-5" />
-                  <span>Claim {totalTokens.toLocaleString()} $FLAPPY Tokens</span>
+                  <span>{signatureData ? 'Claim' : 'Prepare &'} {totalTokens.toLocaleString()} $FLAPPY Tokens</span>
                 </div>
               )}
             </button>
+            
+            {/* Show signature preparation status */}
+            {isConnected && !hasReachedDailyLimit && totalTokens > 0 && !tokensClaimed && (
+              <div className="text-center mt-2">
+                {signatureData ? (
+                  <p className="text-xs text-green-600">
+                    ✓ Transaction ready - Click to claim instantly!
+                  </p>
+                ) : isRequestingSignature ? (
+                  <p className="text-xs text-blue-600">
+                    Preparing transaction...
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-500">
+                    Transaction will be prepared when you click claim
+                  </p>
+                )}
+              </div>
+            )}
             
             {totalTokens > 0 && (
               <p className="text-xs text-gray-500 text-center mt-2">
