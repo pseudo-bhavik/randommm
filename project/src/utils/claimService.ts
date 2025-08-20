@@ -11,7 +11,7 @@ export interface SignClaimRequest {
 export interface SignClaimResponse {
   success: boolean;
   signature?: string;
-  amount?: number;
+  amount?: string;
   error?: string;
 }
 

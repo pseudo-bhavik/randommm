@@ -22,7 +22,7 @@ interface ClaimRequest {
 interface ClaimResponse {
   success: boolean
   signature?: string
-  amount?: number
+  amount?: string
   error?: string
 }
 
@@ -117,7 +117,10 @@ serve(async (req) => {
 
     // Calculate token amount (same logic as frontend)
     const TOKEN_MULTIPLIER = 50
-    const amount = BigInt(Math.floor(score * multiplier * TOKEN_MULTIPLIER))
+    const baseAmount = Math.floor(score * multiplier * TOKEN_MULTIPLIER)
+    
+    // Convert to wei (18 decimals) for ERC-20 token
+    const amountInWei = BigInt(baseAmount) * (BigInt(10) ** BigInt(18))
 
     // Convert gameSessionId to bytes32
     const gameSessionIdBytes32 = ethers.id(gameSessionId)
@@ -126,7 +129,7 @@ serve(async (req) => {
     // This must match exactly what the contract expects in claimReward function
     const messageHash = ethers.solidityPackedKeccak256(
       ['address', 'uint256', 'uint256', 'uint256', 'bytes32', 'address'],
-      [playerAddress, amount, score, multiplier, gameSessionIdBytes32, contractAddress]
+      [playerAddress, amountInWei, score, multiplier, gameSessionIdBytes32, contractAddress]
     )
 
     // Create wallet instance for signing
@@ -139,7 +142,7 @@ serve(async (req) => {
     const response: ClaimResponse = {
       success: true,
       signature,
-      amount: Number(amount), // Convert back to number for frontend
+      amount: amountInWei.toString(), // Convert to string for frontend
     }
 
     return new Response(

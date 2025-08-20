@@ -115,7 +115,7 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
       // Step 2: Call smart contract with the signature
       await claimReward({
         playerAddress: address!,
-        amount: BigInt(signatureResponse.amount || totalTokens),
+        amount: BigInt(signatureResponse.amount!),
         score,
         multiplier,
         gameSessionId,
