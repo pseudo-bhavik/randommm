@@ -5,7 +5,7 @@ import { createHash } from "https://deno.land/std@0.177.0/node/crypto.ts"
 import { ethers } from "npm:ethers@6.8.0"
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://randommm-ruby.vercel.app',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
