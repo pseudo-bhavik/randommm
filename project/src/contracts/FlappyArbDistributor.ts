@@ -609,8 +609,8 @@ export const FLAPPY_ARB_DISTRIBUTOR_ABI = [
 // Contract addresses - UPDATE THESE AFTER DEPLOYMENT
 export const CONTRACT_ADDRESSES = {
   // Sepolia testnet addresses (update with your deployed contract addresses)
-  FLAPPY_ARB_DISTRIBUTOR: '0x6126489b4c0CA5f4D4EFC85D753F7C5cfAf4adF4', // Replace with your actual deployed FlappyArbDistributor address
-  FLAPPY_TOKEN: '0x236f799d4f9b574413a280a9e4b9db14b873dbbc', // Replace with your actual SMOL token address
+  FLAPPY_ARB_DISTRIBUTOR: '0xYOUR_DEPLOYED_CONTRACT_ADDRESS_HERE', // Replace with your actual deployed FlappyArbDistributor address
+  FLAPPY_TOKEN: '0xYOUR_FLAPPY_TOKEN_ADDRESS_HERE', // Replace with your actual FLAPPY token address
 } as const;
 
 // Contract configuration

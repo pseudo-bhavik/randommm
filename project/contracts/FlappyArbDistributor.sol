@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol"; // For signature 
 
 /**
  * @title FlappyArbDistributor
- * @dev Contract for distributing $SMOL tokens to Flappy Arb game players
+ * @dev Contract for distributing $FLAPPY tokens to Flappy Arb game players
  *
  * This contract allows a designated game server to authorize token claims
  * by signing messages. It includes features for pausing distribution,
@@ -18,7 +18,7 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol"; // For signature 
 contract FlappyArbDistributor is Ownable, ReentrancyGuard, Pausable {
     using ECDSA for bytes32; // Enables .toEthSignedMessageHash() and .recover()
 
-    IERC20 public immutable smolToken;
+    IERC20 public immutable flappyToken;
     
     // The address of the game server that is authorized to sign claim requests.
     // Only signatures from this address will be accepted for token claims.
@@ -59,14 +59,14 @@ contract FlappyArbDistributor is Ownable, ReentrancyGuard, Pausable {
 
     /**
      * @dev Constructor to initialize the contract.
-     * @param _smolTokenAddress The address of the $SMOL ERC20 token.
+     * @param _flappyTokenAddress The address of the $FLAPPY ERC20 token.
      * @param _initialGameServerSigner The initial address authorized to sign claim requests.
      */
-    constructor(address _smolTokenAddress, address _initialGameServerSigner) Ownable(msg.sender) {
-        require(_smolTokenAddress != address(0), "Invalid SMOL token address");
+    constructor(address _flappyTokenAddress, address _initialGameServerSigner) Ownable(msg.sender) {
+        require(_flappyTokenAddress != address(0), "Invalid FLAPPY token address");
         require(_initialGameServerSigner != address(0), "Invalid initial game server signer address");
         
-        smolToken = IERC20(_smolTokenAddress);
+        flappyToken = IERC20(_flappyTokenAddress);
         gameServerSigner = _initialGameServerSigner;
         
         // Set initial default limits (owner can change these later)
@@ -157,8 +157,8 @@ contract FlappyArbDistributor is Ownable, ReentrancyGuard, Pausable {
         // Prevent withdrawing the main SMOL token if it's the only one in the contract
         // This check is important if the contract is intended to hold SMOL tokens for distribution.
         // If the contract is only meant to hold other accidental tokens, this check can be removed.
-        if (_tokenAddress == address(smolToken)) {
-            revert("Cannot use emergency withdraw for the main SMOL token");
+        if (_tokenAddress == address(flappyToken)) {
+            revert("Cannot use emergency withdraw for the main FLAPPY token");
         }
 
         token.transfer(_to, balance);
@@ -168,12 +168,12 @@ contract FlappyArbDistributor is Ownable, ReentrancyGuard, Pausable {
     // --- User Claim Function ---
 
     /**
-     * @dev Allows a user to claim their $SMOL token rewards.
+     * @dev Allows a user to claim their $FLAPPY token rewards.
      * This function is protected by a signature verification mechanism, ensuring that
      * only claims authorized by the designated `gameServerSigner` are processed.
      *
      * @param _player The address of the player claiming the reward. This must be `msg.sender`.
-     * @param _amount The amount of $SMOL tokens to claim.
+     * @param _amount The amount of $FLAPPY tokens to claim.
      * @param _score The game score associated with this claim (for record-keeping).
      * @param _multiplier The multiplier associated with this claim (for record-keeping).
      * @param _gameSessionId A unique identifier for the game session. This prevents
@@ -226,8 +226,8 @@ contract FlappyArbDistributor is Ownable, ReentrancyGuard, Pausable {
         require(signer == gameServerSigner, "Invalid signature or unauthorized signer");
 
         // 5. Token Transfer
-        // Transfer the specified amount of SMOL tokens from this contract to the player.
-        smolToken.transfer(_player, _amount);
+        // Transfer the specified amount of FLAPPY tokens from this contract to the player.
+        flappyToken.transfer(_player, _amount);
 
         // 6. Update State
         claimedRewards[_player][_gameSessionId] = true; // Mark this session as claimed

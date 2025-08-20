@@ -9,20 +9,20 @@ async function main() {
   console.log("Account balance:", (await deployer.provider.getBalance(deployer.address)).toString());
 
   // Contract constructor parameters
-  const SMOL_TOKEN_ADDRESS = process.env.SMOL_TOKEN_ADDRESS || "0x0000000000000000000000000000000000000000";
+  const FLAPPY_TOKEN_ADDRESS = process.env.FLAPPY_TOKEN_ADDRESS || "0x0000000000000000000000000000000000000000";
   const GAME_SERVER_SIGNER = process.env.GAME_SERVER_SIGNER || deployer.address;
 
-  if (SMOL_TOKEN_ADDRESS === "0x0000000000000000000000000000000000000000") {
-    console.error("❌ Please set SMOL_TOKEN_ADDRESS in your .env file");
+  if (FLAPPY_TOKEN_ADDRESS === "0x0000000000000000000000000000000000000000") {
+    console.error("❌ Please set FLAPPY_TOKEN_ADDRESS in your .env file");
     process.exit(1);
   }
 
-  console.log("SMOL Token Address:", SMOL_TOKEN_ADDRESS);
+  console.log("FLAPPY Token Address:", FLAPPY_TOKEN_ADDRESS);
   console.log("Game Server Signer:", GAME_SERVER_SIGNER);
 
   // Deploy the contract
   const FlappyArbDistributor = await ethers.getContractFactory("FlappyArbDistributor");
-  const distributor = await FlappyArbDistributor.deploy(SMOL_TOKEN_ADDRESS, GAME_SERVER_SIGNER);
+  const distributor = await FlappyArbDistributor.deploy(FLAPPY_TOKEN_ADDRESS, GAME_SERVER_SIGNER);
 
   await distributor.waitForDeployment();
   const contractAddress = await distributor.getAddress();
@@ -40,7 +40,7 @@ async function main() {
   // Save deployment info
   const deploymentInfo = {
     contractAddress,
-    smolTokenAddress: SMOL_TOKEN_ADDRESS,
+    flappyTokenAddress: FLAPPY_TOKEN_ADDRESS,
     gameServerSigner: GAME_SERVER_SIGNER,
     deployer: deployer.address,
     network: (await ethers.provider.getNetwork()).name,
@@ -51,12 +51,12 @@ async function main() {
   console.log("\n🔧 Next Steps:");
   console.log("1. Update CONTRACT_ADDRESSES in src/contracts/FlappyArbDistributor.ts");
   console.log("2. Set GAME_SERVER_PRIVATE_KEY in Supabase environment variables");
-  console.log("3. Fund the contract with SMOL tokens for distribution");
+  console.log("3. Fund the contract with FLAPPY tokens for distribution");
   console.log("4. Verify the contract on Etherscan (optional)");
 
   // Verification command
   console.log("\n📝 To verify on Etherscan, run:");
-  console.log(`npx hardhat verify --network ${process.env.HARDHAT_NETWORK || 'sepolia'} ${contractAddress} "${SMOL_TOKEN_ADDRESS}" "${GAME_SERVER_SIGNER}"`);
+  console.log(`npx hardhat verify --network ${process.env.HARDHAT_NETWORK || 'sepolia'} ${contractAddress} "${FLAPPY_TOKEN_ADDRESS}" "${GAME_SERVER_SIGNER}"`);
 
   return deploymentInfo;
 }

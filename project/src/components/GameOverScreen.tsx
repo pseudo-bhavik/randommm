@@ -164,7 +164,7 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
             
             <div className="border-t pt-2 mt-3">
               <div className="flex justify-between items-center">
-                <span className="text-gray-800 font-bold">Total $SMOL Tokens</span>
+                <span className="text-gray-800 font-bold">Total $FLAPPY Tokens</span>
                 <span className="text-2xl font-bold text-green-600">{totalTokens.toLocaleString()}</span>
               </div>
             </div>
@@ -246,12 +246,12 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
               ) : !isConnected ? (
                 <div className="flex items-center justify-center space-x-2">
                   <ExternalLink className="w-5 h-5" />
-                  <span>Connect Wallet & Claim {totalTokens.toLocaleString()} $SMOL</span>
+                  <span>Connect Wallet & Claim {totalTokens.toLocaleString()} $FLAPPY</span>
                 </div>
               ) : (
                 <div className="flex items-center justify-center space-x-2">
                   <ExternalLink className="w-5 h-5" />
-                  <span>Claim {totalTokens.toLocaleString()} $SMOL Tokens</span>
+                  <span>Claim {totalTokens.toLocaleString()} $FLAPPY Tokens</span>
                 </div>
               )}
             </button>
@@ -277,7 +277,7 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
                 <span className="font-medium">Tokens Successfully Claimed!</span>
               </div>
               <p className="text-green-700 text-sm mt-2">
-                {totalTokens.toLocaleString()} $SMOL tokens have been added to your wallet.
+                {totalTokens.toLocaleString()} $FLAPPY tokens have been added to your wallet.
               </p>
               {transactionHash && (
                 <a

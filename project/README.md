@@ -1,4 +1,4 @@
-# Flappy Arb - Backend Integration Guide
+# Flappy Arb - $FLAPPY Token Integration Guide
 
 This project now includes a complete backend system for handling token claims through smart contracts.
 
@@ -11,7 +11,7 @@ This project now includes a complete backend system for handling token claims th
   - `GAME_SERVER_PRIVATE_KEY`: The private key of the wallet that will sign claims
 
 ### 2. Smart Contract Integration
-- **Contract ABI**: Defined in `src/contracts/FlappyArbDistributor.ts`
+- **Contract ABI**: Defined in `src/contracts/FlappyArbDistributor.ts` 
 - **Hooks**: Custom React hooks in `src/hooks/useContract.ts` for contract interactions
 - **Service**: Claim service in `src/utils/claimService.ts` for backend communication
 
@@ -23,7 +23,7 @@ This project now includes a complete backend system for handling token claims th
    ```typescript
    export const CONTRACT_ADDRESSES = {
      FLAPPY_ARB_DISTRIBUTOR: '0xYourDeployedContractAddress',
-     SMOL_TOKEN: '0xYourSMOLTokenAddress',
+     FLAPPY_TOKEN: '0xYourFLAPPYTokenAddress',
    };
    ```
 
@@ -52,7 +52,7 @@ The Edge Function will be automatically deployed when you connect to Supabase. M
 2. **Signature Request**: Frontend calls the `sign-claim` Edge Function with game data
 3. **Backend Validation**: Edge Function validates the request and signs it with the game server's private key
 4. **Smart Contract Call**: Frontend uses the signature to call `claimReward` on the smart contract
-5. **Token Transfer**: Smart contract validates the signature and transfers tokens to the player
+5. **Token Transfer**: Smart contract validates the signature and transfers $FLAPPY tokens to the player
 
 ### Security Features
 - **Signature Verification**: Only the designated game server can authorize token claims
@@ -64,7 +64,7 @@ The Edge Function will be automatically deployed when you connect to Supabase. M
 ## Smart Contract Functions
 
 ### For Players
-- `claimReward()`: Claim tokens with a valid signature
+- `claimReward()`: Claim $FLAPPY tokens with a valid signature
 - `getDailyClaims()`: Check how many claims made today
 - `getTotalClaimed()`: Check total tokens claimed
 
@@ -77,8 +77,8 @@ The Edge Function will be automatically deployed when you connect to Supabase. M
 ## Testing
 
 ### Local Testing
-1. Deploy contract to Sepolia testnet
-2. Fund the contract with test SMOL tokens
+1. Deploy contract to Sepolia testnet  
+2. Fund the contract with test $FLAPPY tokens
 3. Set up Supabase with test environment variables
 4. Test the complete flow from game completion to token claiming
 
@@ -86,7 +86,7 @@ The Edge Function will be automatically deployed when you connect to Supabase. M
 1. Deploy contract to Arbitrum mainnet
 2. Update contract addresses in the frontend
 3. Configure production Supabase environment
-4. Fund contract with real SMOL tokens
+4. Fund contract with real $FLAPPY tokens
 
 ## Monitoring
 

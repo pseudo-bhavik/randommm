@@ -27,7 +27,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({ onStartGame, remainingPlays,
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-2 tracking-wide">
             Flappy <span className="text-yellow-400">Arb</span>
           </h1>
-          <p className="text-lg sm:text-xl text-purple-200">Earn $SMOL tokens while you play!</p>
+          <p className="text-lg sm:text-xl text-purple-200">Earn $FLAPPY tokens while you play!</p>
         </div>
 
         {/* Best Score Display */}
@@ -77,7 +77,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({ onStartGame, remainingPlays,
                 <span className="text-purple-200">3x Multiplier Orb</span>
               </div>
               <div className="mt-3 pt-3 border-t border-white/20 text-sm">
-                <span className="text-yellow-300">Tokens = Score × Multiplier × 50</span>
+                <span className="text-yellow-300">$FLAPPY = Score × Multiplier × 50</span>
               </div>
               <div className="mt-2 text-sm text-purple-200">
                 <span className="text-blue-300">Every 5th game:</span> Special multiplier orb & coin guaranteed!
