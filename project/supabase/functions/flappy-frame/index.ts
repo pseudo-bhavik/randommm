@@ -28,7 +28,7 @@ const FLAPPY_ARB_DISTRIBUTOR_ABI = [
 
 // Contract addresses - these should match your deployed contracts
 const CONTRACT_ADDRESSES = {
-  FLAPPY_ARB_DISTRIBUTOR: '0xYOUR_DEPLOYED_CONTRACT_ADDRESS_HERE', // Update with your actual address
+  FLAPPY_ARB_DISTRIBUTOR: '0x6126489b4c0CA5f4D4EFC85D753F7C5cfAf4adF4', // Update with your actual address
 };
 
 interface FrameActionBody {
@@ -190,10 +190,17 @@ async function requestSignature(playerAddress: string, score: number, multiplier
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
   const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
   
+  // Add debugging logs
+  console.log('DEBUG: Supabase URL:', supabaseUrl);
+  console.log('DEBUG: Supabase Anon Key (first 10 chars):', supabaseAnonKey ? supabaseAnonKey.substring(0, 10) + '...' : 'N/A');
+  console.log('DEBUG: Request payload:', { playerAddress, score, multiplier, gameSessionId });
+  
   if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('ERROR: Missing Supabase configuration - URL:', !!supabaseUrl, 'Key:', !!supabaseAnonKey);
     throw new Error('Supabase configuration missing');
   }
 
+  console.log('DEBUG: Making request to sign-claim function...');
   const response = await fetch(`${supabaseUrl}/functions/v1/sign-claim`, {
     method: 'POST',
     headers: {
@@ -209,15 +216,24 @@ async function requestSignature(playerAddress: string, score: number, multiplier
     }),
   });
 
+  console.log('DEBUG: Response status:', response.status);
+  console.log('DEBUG: Response headers:', Object.fromEntries(response.headers.entries()));
+  
   if (!response.ok) {
+    const errorText = await response.text();
+    console.error('ERROR: Failed to get signature - Status:', response.status, 'Response:', errorText);
     throw new Error(`Failed to get signature: ${response.status}`);
   }
 
   const data = await response.json();
+  console.log('DEBUG: Sign-claim response success:', data.success);
+  
   if (!data.success) {
+    console.error('ERROR: Sign-claim returned failure:', data.error);
     throw new Error(data.error || 'Failed to get signature');
   }
 
+  console.log('DEBUG: Successfully obtained signature');
   return {
     signature: data.signature,
     amount: data.amount,
@@ -411,7 +427,7 @@ serve(async (req) => {
           throw new Error('Invalid claim action');
         } else {
           // Redirect to the main game
-          const gameUrl = 'https://your-deployed-game-url.com'; // Update with your actual game URL
+          const gameUrl = 'https://flappy-arb.vercel.app/'; // Update with your actual game URL
           return new Response('', {
             status: 302,
             headers: {
@@ -422,7 +438,7 @@ serve(async (req) => {
         }
       } else if (untrustedData.buttonIndex === 2) {
         // "Play Again" button - redirect to game
-        const gameUrl = 'https://your-deployed-game-url.com'; // Update with your actual game URL
+        const gameUrl = 'https://flappy-arb.vercel.app/'; // Update with your actual game URL
         return new Response('', {
           status: 302,
           headers: {
