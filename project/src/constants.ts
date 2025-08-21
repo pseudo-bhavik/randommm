@@ -1,8 +1,8 @@
 // Game physics constants
 export const PHYSICS = {
-  GRAVITY: 0.2,
-  JUMP_FORCE: -5.0,
-  PIPE_SPEED: 4.0,
+  GRAVITY: 0.12,
+  JUMP_FORCE: -4.0,
+  PIPE_SPEED: 2.2,
   PIPE_SPAWN_DISTANCE: 300,
   BIRD_SIZE: 45,
   PIPE_WIDTH: 60,
@@ -13,7 +13,7 @@ export const GAME = {
   WIDTH: 400,
   HEIGHT: 700,
   GROUND_HEIGHT: 70,
-  PIPE_GAP_VALUES: [160, 180, 200],
+  PIPE_GAP_VALUES: [180, 200, 220],
   PIPE_VERTICAL_PADDING: 55,
   BORDER_HEIGHT: 25,
 } as const;
