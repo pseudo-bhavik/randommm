@@ -445,31 +445,8 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       
       // Loading spinner
       const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
+      const centerY = canvas.height * 0.75; // Position towards bottom
       const time = Date.now() * 0.005;
-      
-      ctx.strokeStyle = '#fbbf24';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.arc(centerX, centerY - 20, 20, time, time + Math.PI * 1.5);
-      ctx.stroke();
-      
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-      ctx.font = 'bold 20px "Courier New", monospace';
-      ctx.textAlign = 'center';
-      ctx.strokeStyle = '#1e1b4b';
-      ctx.lineWidth = 2;
-      const loadingText = 'LOADING ASSETS...';
-      ctx.strokeText(loadingText, centerX, centerY + 30);
-      ctx.fillText(loadingText, centerX, centerY + 30);
-      
-      ctx.font = 'bold 14px "Courier New", monospace';
-      const subText = 'Preparing your bird';
-      ctx.strokeText(subText, centerX, centerY + 55);
-      ctx.fillText(subText, centerX, centerY + 55);
-      // Loading screen with horizontal bar
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // Draw horizontal bar in center
       const barWidth = 280;
