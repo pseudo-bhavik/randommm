@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trophy, Zap, ArrowLeft, ExternalLink, RotateCcw, Home } from 'lucide-react';
+import { Trophy, Zap, ArrowLeft, ExternalLink, RotateCcw, Home, Share2 } from 'lucide-react';
 import { useConnect, useAccount, useDisconnect } from 'wagmi';
 import { calculateTokenReward } from '../utils/gameUtils';
 import { useFlappyArbContract, useContractReads } from '../hooks/useContract';
@@ -29,6 +29,7 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
   const [claimError, setClaimError] = useState<string | null>(null);
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
   const [signatureData, setSignatureData] = useState<{signature: string, amount: string} | null>(null);
+  const [farcasterFrameUrl, setFarcasterFrameUrl] = useState<string | null>(null);
   
   const { connect, connectors, isPending: isConnectPending } = useConnect();
   const { isConnected, address } = useAccount();
@@ -46,6 +47,17 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
   // Generate a unique game session ID for this claim
   const gameSessionId = React.useMemo(() => generateGameSessionId(), []);
   
+  // Generate Farcaster Frame URL
+  React.useEffect(() => {
+    if (address && totalTokens > 0) {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      if (supabaseUrl) {
+        const frameUrl = `${supabaseUrl}/functions/v1/flappy-frame?score=${score}&multiplier=${multiplier}&address=${address}`;
+        setFarcasterFrameUrl(frameUrl);
+      }
+    }
+  }, [address, score, multiplier, totalTokens]);
+
   // Pre-load signature when wallet is connected and conditions are met
   React.useEffect(() => {
     const preloadSignature = async () => {
@@ -140,6 +152,15 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
     }
   };
   
+  const handleShareToFarcaster = () => {
+    if (farcasterFrameUrl) {
+      const shareText = `Just scored ${score} points in Flappy Arb${multiplier > 1 ? ` with a ${multiplier}x multiplier` : ''}! 🎮\n\nEarned ${totalTokens.toLocaleString()} $FLAPPY tokens on @arbitrum! 🪙\n\nPlay and earn: ${farcasterFrameUrl}`;
+      
+      // Open Warpcast with pre-filled cast
+      const warpcastUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}`;
+      window.open(warpcastUrl, '_blank');
+    }
+  };
   const handleClaimTokens = async () => {
     // If wallet is not connected, connect first
     if (!isConnected) {
@@ -372,6 +393,17 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
 
         {/* Action Buttons */}
         <div className="flex flex-col space-y-3 mb-24">
+          {/* Share to Farcaster Button */}
+          {farcasterFrameUrl && totalTokens > 0 && (
+            <button
+              onClick={handleShareToFarcaster}
+              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+            >
+              <Share2 className="w-4 h-4" />
+              <span>Share on Farcaster</span>
+            </button>
+          )}
+          
           {remainingPlays > 0 && (tokensClaimed || totalTokens === 0 || hasReachedDailyLimit) && (
             <button
               onClick={onPlayAgain}
