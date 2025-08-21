@@ -37,6 +37,8 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
   const animationFrameRef = useRef<number>();
   const [gameInitialized, setGameInitialized] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [birdImage, setBirdImage] = useState<HTMLImageElement | null>(null);
+  const [isBirdImageLoaded, setIsBirdImageLoaded] = useState(false);
   const staticGrassBladesRef = useRef<{ x: number; width: number; height: number }[]>([]);
   const grassTuftsRef = useRef<GrassTuft[]>([]);
   
@@ -104,6 +106,20 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     birdGradient.addColorStop(0.7, '#f59e0b');
     birdGradient.addColorStop(1, '#d97706');
     birdGradientRef.current = birdGradient;
+  }, []);
+
+  // Load custom bird image
+  useEffect(() => {
+    const img = new Image();
+    img.src = '/my-bird.png'; // Make sure this path matches your image file name
+    img.onload = () => {
+      setBirdImage(img);
+      setIsBirdImageLoaded(true);
+    };
+    img.onerror = () => {
+      console.error('Failed to load bird image.');
+      setIsBirdImageLoaded(false); // Ensure it's false on error
+    };
   }, []);
 
   // Generate initial clouds
@@ -361,39 +377,47 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     ctx.translate(bird.x, bird.y);
     ctx.rotate((bird.rotation * Math.PI) / 180);
     
-    // Bird body with pre-created gradient
-    if (birdGradientRef.current) {
-      ctx.fillStyle = birdGradientRef.current;
+    if (isBirdImageLoaded && birdImage) {
+      // Draw the custom bird image
+      // Adjust the x, y, width, and height based on your image's dimensions
+      // and the desired size relative to PHYSICS.BIRD_SIZE
+      const imageWidth = PHYSICS.BIRD_SIZE * 1.5; // Example: make image slightly larger
+      const imageHeight = PHYSICS.BIRD_SIZE * 1.5; // Example: make image slightly larger
+      ctx.drawImage(birdImage, -imageWidth / 2, -imageHeight / 2, imageWidth, imageHeight);
     } else {
-      // Fallback if gradient not ready
-      ctx.fillStyle = '#fbbf24';
+      // Fallback: Draw the default bird if image is not loaded
+      if (birdGradientRef.current) {
+        ctx.fillStyle = birdGradientRef.current;
+      } else {
+        ctx.fillStyle = '#fbbf24';
+      }
+      ctx.beginPath();
+      ctx.arc(0, 0, PHYSICS.BIRD_SIZE / 2, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Bird glow effect (optional for fallback)
+      ctx.shadowColor = '#fbbf24';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(0, 0, PHYSICS.BIRD_SIZE / 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      
+      // Bird eye (optional for fallback)
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.arc(-5, -5, 3, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Bird beak (optional for fallback)
+      ctx.fillStyle = '#FF8C00';
+      ctx.beginPath();
+      ctx.moveTo(PHYSICS.BIRD_SIZE / 2 - 5, 0);
+      ctx.lineTo(PHYSICS.BIRD_SIZE / 2 + 5, -2);
+      ctx.lineTo(PHYSICS.BIRD_SIZE / 2 + 5, 2);
+      ctx.closePath();
+      ctx.fill();
     }
-    ctx.beginPath();
-    ctx.arc(0, 0, PHYSICS.BIRD_SIZE / 2, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Bird glow effect
-    ctx.shadowColor = '#fbbf24';
-    ctx.shadowBlur = 10;
-    ctx.beginPath();
-    ctx.arc(0, 0, PHYSICS.BIRD_SIZE / 2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    
-    // Bird eye
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.arc(-5, -5, 3, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Bird beak
-    ctx.fillStyle = '#FF8C00';
-    ctx.beginPath();
-    ctx.moveTo(PHYSICS.BIRD_SIZE / 2 - 5, 0);
-    ctx.lineTo(PHYSICS.BIRD_SIZE / 2 + 5, -2);
-    ctx.lineTo(PHYSICS.BIRD_SIZE / 2 + 5, 2);
-    ctx.closePath();
-    ctx.fill();
     
     ctx.restore();
 

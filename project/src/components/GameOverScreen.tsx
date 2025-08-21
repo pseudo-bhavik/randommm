@@ -319,25 +319,6 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
               )}
             </button>
             
-            {/* Show signature preparation status */}
-            {isConnected && !hasReachedDailyLimit && totalTokens > 0 && !tokensClaimed && (
-              <div className="text-center mt-2">
-                {signatureData ? (
-                  <p className="text-xs text-green-600">
-                    ✓ Transaction ready - Click to claim instantly!
-                  </p>
-                ) : isRequestingSignature ? (
-                  <p className="text-xs text-blue-600">
-                    Preparing transaction...
-                  </p>
-                ) : (
-                  <p className="text-xs text-gray-500">
-                    Transaction will be prepared when you click claim
-                  </p>
-                )}
-              </div>
-            )}
-            
             {totalTokens > 0 && (
               <p className="text-xs text-gray-500 text-center mt-2">
                 {!isConnected 
