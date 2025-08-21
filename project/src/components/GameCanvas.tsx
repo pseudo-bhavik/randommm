@@ -37,6 +37,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
   const animationFrameRef = useRef<number>();
   const [gameInitialized, setGameInitialized] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [isLoadingAssets, setIsLoadingAssets] = useState(true);
   const [birdImage, setBirdImage] = useState<HTMLImageElement | null>(null);
   const [isBirdImageLoaded, setIsBirdImageLoaded] = useState(false);
   const staticGrassBladesRef = useRef<{ x: number; width: number; height: number }[]>([]);
@@ -110,15 +111,18 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
   // Load custom bird image
   useEffect(() => {
+    setIsLoadingAssets(true);
     const img = new Image();
     img.src = '/my-bird.png'; // Make sure this path matches your image file name
     img.onload = () => {
       setBirdImage(img);
       setIsBirdImageLoaded(true);
+      setIsLoadingAssets(false);
     };
     img.onerror = () => {
       console.error('Failed to load bird image.');
       setIsBirdImageLoaded(false); // Ensure it's false on error
+      setIsLoadingAssets(false); // Allow game to continue with fallback
     };
   }, []);
 
@@ -176,6 +180,9 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
   // Handle user input
   const handleJump = useCallback(() => {
+    // Don't allow input while assets are loading
+    if (isLoadingAssets) return;
+    
     if (!gameStarted) {
       // First tap/click starts the game
       setGameStarted(true);
@@ -184,7 +191,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       // Subsequent taps/clicks make the bird jump
       birdRef.current.velocity = PHYSICS.JUMP_FORCE;
     }
-  }, [gameStarted]);
+  }, [gameStarted, isLoadingAssets]);
 
   // Add event listeners
   useEffect(() => {
@@ -431,7 +438,36 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     ctx.fillText(scoreRef.current.toString(), canvas.width / 2, 60);
 
     // Draw "Tap to Start" message if game hasn't started
-    if (!gameStarted) {
+    if (isLoadingAssets) {
+      // Loading screen
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Loading spinner
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const time = Date.now() * 0.005;
+      
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY - 20, 20, time, time + Math.PI * 1.5);
+      ctx.stroke();
+      
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.font = 'bold 20px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.strokeStyle = '#1e1b4b';
+      ctx.lineWidth = 2;
+      const loadingText = 'LOADING ASSETS...';
+      ctx.strokeText(loadingText, centerX, centerY + 30);
+      ctx.fillText(loadingText, centerX, centerY + 30);
+      
+      ctx.font = 'bold 14px "Courier New", monospace';
+      const subText = 'Preparing your bird';
+      ctx.strokeText(subText, centerX, centerY + 55);
+      ctx.fillText(subText, centerX, centerY + 55);
+    } else if (!gameStarted) {
       // Add semi-transparent background for better readability
       ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
       ctx.fillRect(canvas.width / 2 - 120, canvas.height / 2 + 20, 240, 60);
@@ -494,7 +530,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         ref={canvasRef}
         width={GAME.WIDTH}
         height={GAME.HEIGHT}
-        className="border-2 sm:border-4 border-white rounded-lg shadow-2xl cursor-pointer max-w-full"
+        className={`border-2 sm:border-4 border-white rounded-lg shadow-2xl max-w-full ${isLoadingAssets ? 'cursor-wait' : 'cursor-pointer'}`}
         style={{ 
           maxWidth: '100vw', 
           maxHeight: '70vh',
@@ -504,7 +540,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       />
       <div className="mt-2 sm:mt-4 text-white text-center px-4">
         <p className="text-sm sm:text-lg font-semibold">
-          {!gameStarted ? 'Tap to start flying!' : 'Tap to keep flying!'}
+          {isLoadingAssets ? 'Loading your bird...' : !gameStarted ? 'Tap to start flying!' : 'Tap to keep flying!'}
         </p>
       </div>
     </div>

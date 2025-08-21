@@ -4,7 +4,7 @@ export const PHYSICS = {
   JUMP_FORCE: -4.0,
   PIPE_SPEED: 2.2,
   PIPE_SPAWN_DISTANCE: 300,
-  BIRD_SIZE: 30,
+  BIRD_SIZE: 45,
   PIPE_WIDTH: 60,
 } as const;
 
