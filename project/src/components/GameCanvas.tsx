@@ -467,6 +467,28 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       const subText = 'Preparing your bird';
       ctx.strokeText(subText, centerX, centerY + 55);
       ctx.fillText(subText, centerX, centerY + 55);
+      // Loading screen with horizontal bar
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw horizontal bar in center
+      const barWidth = 280;
+      const barHeight = 70;
+      
+      // Draw the bar background
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.fillRect(centerX - barWidth / 2, centerY - barHeight / 2, barWidth, barHeight);
+      
+      // Draw the bar border
+      ctx.strokeStyle = '#1e1b4b';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(centerX - barWidth / 2, centerY - barHeight / 2, barWidth, barHeight);
+      
+      // Draw "Tap to Start" text centered in the bar
+      ctx.fillStyle = '#1e1b4b';
+      ctx.font = 'bold 24px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Tap to Start', centerX, centerY + 8);
     } else if (!gameStarted) {
       // Add semi-transparent background for better readability
       ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';

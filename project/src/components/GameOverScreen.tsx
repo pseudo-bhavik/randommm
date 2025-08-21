@@ -98,7 +98,21 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
   // Handle contract errors
   React.useEffect(() => {
     if (contractError) {
-      setClaimError(contractError.message || 'Transaction failed');
+      // Provide clean, user-friendly error messages
+      const errorMessage = contractError.message || '';
+      
+      if (errorMessage.includes('User rejected') || errorMessage.includes('user rejected')) {
+        setClaimError('Transaction cancelled by user.');
+      } else if (errorMessage.includes('insufficient funds')) {
+        setClaimError('Insufficient funds for gas fees.');
+      } else if (errorMessage.includes('Daily claim limit reached')) {
+        setClaimError('Daily claim limit reached. Try again tomorrow.');
+      } else if (errorMessage.includes('Invalid signature')) {
+        setClaimError('Invalid signature. Please try again.');
+      } else {
+        setClaimError('Transaction failed. Please try again.');
+      }
+      
       setIsClaimingTokens(false);
       setIsInitiatingTransaction(false);
     }
