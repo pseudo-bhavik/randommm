@@ -1,8 +1,8 @@
 // Game physics constants
 export const PHYSICS = {
-  GRAVITY: 0.18,
+  GRAVITY: 0.2,
   JUMP_FORCE: -5.0,
-  PIPE_SPEED: 3.5,
+  PIPE_SPEED: 4.0,
   PIPE_SPAWN_DISTANCE: 300,
   BIRD_SIZE: 45,
   PIPE_WIDTH: 60,
