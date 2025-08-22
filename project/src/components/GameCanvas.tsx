@@ -318,9 +318,27 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     // Draw clouds (simplified for performance)
     ctx.fillStyle = COLORS.CLOUD_WHITE;
     clouds.forEach(cloud => {
-      // Draw cloud as single ellipse for better performance
+      // Draw cloud as multiple overlapping circles for traditional cloud appearance
+      const baseSize = cloud.size * 0.4;
+      
+      // Main cloud body (center circle)
       ctx.beginPath();
-      ctx.ellipse(cloud.x, cloud.y, cloud.size * 0.8, cloud.size * 0.5, 0, 0, Math.PI * 2);
+      ctx.arc(cloud.x, cloud.y, baseSize, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Left puff
+      ctx.beginPath();
+      ctx.arc(cloud.x - baseSize * 0.6, cloud.y + baseSize * 0.2, baseSize * 0.7, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Right puff
+      ctx.beginPath();
+      ctx.arc(cloud.x + baseSize * 0.6, cloud.y + baseSize * 0.2, baseSize * 0.7, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Top puff
+      ctx.beginPath();
+      ctx.arc(cloud.x, cloud.y - baseSize * 0.4, baseSize * 0.6, 0, Math.PI * 2);
       ctx.fill();
     });
 
