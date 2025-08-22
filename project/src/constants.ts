@@ -57,7 +57,7 @@ export const REWARDS = {
 export const RATE_LIMIT = {
   MAX_PLAYS_PER_DAY: 5,
   STORAGE_KEY: 'flappy-arb-plays',
-  MULTIPLIER_GAME_INTERVAL: 5,
+  MULTIPLIER_GAME_INTERVAL: 50,
   MULTIPLIER_TRACKER_KEY: 'flappy-arb-multiplier-tracker',
   MULTIPLIER_MISSED_KEY: 'flappy-arb-multiplier-missed',
   BEST_SCORE_KEY: 'flappy-arb-best-score',
