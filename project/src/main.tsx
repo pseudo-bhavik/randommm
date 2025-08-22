@@ -11,13 +11,12 @@ import './index.css';
 
 // Create Wagmi config
 const config = createConfig({
-  chains: [sepolia, arbitrum], // Add Arbitrum for production
+  chains: [arbitrum],
   connectors: [
     injected(),
     farcasterMiniApp(),
   ],
   transports: {
-    [sepolia.id]: http(),
     [arbitrum.id]: http(),
   },
 });
