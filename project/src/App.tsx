@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
+import { sdk } from '@farcaster/miniapp-sdk';
 import { IntroScreen } from './components/IntroScreen';
 import { MainMenu } from './components/MainMenu';
 import { GameCanvas } from './components/GameCanvas';
@@ -22,11 +23,15 @@ function App() {
 
   // Signal to Farcaster that the Mini-App is ready
   useEffect(() => {
-    try {
-      window.farcaster.ready();
-    } catch (error) {
-      console.warn('Failed to signal Farcaster readiness:', error);
-    }
+    const signalReady = async () => {
+      try {
+        await sdk.actions.ready();
+      } catch (error) {
+        console.warn('Failed to signal Farcaster readiness:', error);
+      }
+    };
+    
+    signalReady();
   }, []);
 
   const handleIntroComplete = useCallback(() => {
