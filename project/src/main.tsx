@@ -1,11 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createConfig, http } from 'wagmi';
-import { sepolia, arbitrum } from 'wagmi/chains';
+import { arbitrum } from 'wagmi/chains';
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { farcasterMiniApp } from '@farcaster/miniapp-wagmi-connector';
-import { injected } from 'wagmi/connectors';
 import App from './App.tsx';
 import './index.css';
 
@@ -13,7 +12,6 @@ import './index.css';
 const config = createConfig({
   chains: [arbitrum],
   connectors: [
-    injected(),
     farcasterMiniApp(),
   ],
   transports: {

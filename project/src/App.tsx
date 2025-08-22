@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { IntroScreen } from './components/IntroScreen';
 import { MainMenu } from './components/MainMenu';
 import { GameCanvas } from './components/GameCanvas';
@@ -19,6 +19,15 @@ function App() {
     updatePlaysToday,
     updateBestScore,
   } = useGameState();
+
+  // Signal to Farcaster that the Mini-App is ready
+  useEffect(() => {
+    try {
+      window.farcaster.ready();
+    } catch (error) {
+      console.warn('Failed to signal Farcaster readiness:', error);
+    }
+  }, []);
 
   const handleIntroComplete = useCallback(() => {
     updateScreen('menu');

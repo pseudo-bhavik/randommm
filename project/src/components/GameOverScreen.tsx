@@ -29,7 +29,6 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
   const [claimError, setClaimError] = useState<string | null>(null);
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
   const [signatureData, setSignatureData] = useState<{signature: string, amount: string} | null>(null);
-  const [farcasterFrameUrl, setFarcasterFrameUrl] = useState<string | null>(null);
   
   const { connect, connectors, isPending: isConnectPending } = useConnect();
   const { isConnected, address } = useAccount();
@@ -47,15 +46,6 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
   // Generate a unique game session ID for this claim
   const gameSessionId = React.useMemo(() => generateGameSessionId(), []);
   
-  // Generate Farcaster Frame URL
-  React.useEffect(() => {
-    if (address && totalTokens > 0) {
-      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-      const frameUrl = `${baseUrl}/api/frame?score=${score}&multiplier=${multiplier}&address=${address}`;
-      setFarcasterFrameUrl(frameUrl);
-    }
-  }, [address, score, multiplier, totalTokens]);
-
   // Pre-load signature when wallet is connected and conditions are met
   React.useEffect(() => {
     const preloadSignature = async () => {
@@ -132,16 +122,12 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
     setIsConnectingWallet(true);
     
     try {
-      // Try Farcaster MiniApp connector first
+      // Use Farcaster MiniApp connector only
       const farcasterConnector = connectors.find(c => c.id === 'farcasterMiniApp');
       if (farcasterConnector) {
         await connect({ connector: farcasterConnector });
       } else {
-        // Fall back to injected connector
-        const injectedConnector = connectors.find(c => c.id === 'injected');
-        if (injectedConnector) {
-          await connect({ connector: injectedConnector });
-        }
+        throw new Error('Farcaster MiniApp connector not available');
       }
     } catch (error) {
       console.error('Failed to connect wallet:', error);
@@ -151,14 +137,13 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
   };
   
   const handleShareToFarcaster = () => {
-    if (farcasterFrameUrl) {
-      const shareText = `Just scored ${score} points in Flappy Arb${multiplier > 1 ? ` with a ${multiplier}x multiplier` : ''}! 🎮\n\nEarned ${totalTokens.toLocaleString()} $FLAPPY tokens on @arbitrum! 🪙\n\nPlay and earn: ${farcasterFrameUrl}`;
-      
-      // Open Warpcast with pre-filled cast
-      const warpcastUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}`;
-      window.open(warpcastUrl, '_blank');
-    }
+    const shareText = `Just scored ${score} points in Flappy Arb${multiplier > 1 ? ` with a ${multiplier}x multiplier` : ''}! 🎮\n\nEarned ${totalTokens.toLocaleString()} $FLAPPY tokens on @arbitrum! 🪙\n\nPlay now in the Flappy Arb Mini-App! 🚀`;
+    
+    // Open Warpcast with pre-filled cast
+    const warpcastUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}`;
+    window.open(warpcastUrl, '_blank');
   };
+  
   const handleClaimTokens = async () => {
     // If wallet is not connected, connect first
     if (!isConnected) {
@@ -392,7 +377,7 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
         {/* Action Buttons */}
         <div className="flex flex-col space-y-3 mb-24">
           {/* Share to Farcaster Button */}
-          {farcasterFrameUrl && totalTokens > 0 && (
+          {totalTokens > 0 && (
             <button
               onClick={handleShareToFarcaster}
               className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
@@ -425,7 +410,7 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
         {/* Branding Footer */}
         <div className="text-center mt-4 pt-3 border-t border-gray-200">
           <div className="text-gray-500 text-sm space-y-1">
-            <div>Built on Farcaster</div>
+            <div>Farcaster Mini-App</div>
             <div>Powered by Arbitrum</div>
           </div>
         </div>

@@ -44,7 +44,7 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
       {/* Branding Footer */}
       <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-center z-20">
         <div className="text-white/80 text-sm space-y-1">
-          <div>Built on Farcaster</div>
+          <div>Farcaster Mini-App</div>
           <div>Powered by Arbitrum</div>
         </div>
       </div>

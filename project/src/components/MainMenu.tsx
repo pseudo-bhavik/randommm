@@ -111,7 +111,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({ onStartGame, remainingPlays,
         {/* Branding Footer */}
         <div className="text-center pb-4">
           <div className="text-white/80 text-sm space-y-1">
-            <div>Built on Farcaster</div>
+            <div>Farcaster Mini-App</div>
             <div>Powered by Arbitrum</div>
           </div>
         </div>
