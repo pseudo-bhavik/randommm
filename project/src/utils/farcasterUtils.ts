@@ -84,6 +84,11 @@ export function generateFarcasterShareUrl(text: string, frameUrl?: string): stri
   return `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}`;
 }
 
+export function generateShareText(score: number, multiplier: number, totalTokens: number, frameUrl: string): string {
+  const multiplierText = multiplier > 1 ? ` with a ${multiplier}x multiplier` : '';
+  return `Just scored ${score} points in Flappy Arb${multiplierText}! 🎮\n\nEarned ${totalTokens.toLocaleString()} $FLAPPY tokens on @arbitrum! 🪙\n\nPlay and earn: ${frameUrl}`;
+}
+
 export function validateFrameSignature(frameData: any): boolean {
   // This is a simplified validation
   // In production, you should use @farcaster/hub-nodejs for proper validation

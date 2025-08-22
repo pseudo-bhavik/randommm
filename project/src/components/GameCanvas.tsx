@@ -129,7 +129,8 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
   // Generate initial clouds
   const generateClouds = useCallback((): Cloud[] => {
     const clouds: Cloud[] = [];
-    for (let i = 0; i < 6; i++) {
+    // Reduce number of clouds for better performance
+    for (let i = 0; i < 4; i++) {
       clouds.push({
         x: Math.random() * GAME.WIDTH * 2,
         y: Math.random() * (GAME.HEIGHT * 0.4) + 20,
@@ -238,7 +239,9 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
     // Update clouds
     const clouds = cloudsRef.current;
-    for (let i = clouds.length - 1; i >= 0; i--) {
+    // Use traditional for loop for better performance
+    let i = clouds.length;
+    while (i--) {
       const cloud = clouds[i];
       cloud.x -= cloud.speed;
       
@@ -256,13 +259,15 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
     // Update pipes
     const pipes = pipesRef.current;
-    for (let i = pipes.length - 1; i >= 0; i--) {
-      const pipe = pipes[i];
+    // Use traditional for loop for better performance
+    let j = pipes.length;
+    while (j--) {
+      const pipe = pipes[j];
       pipe.x -= PHYSICS.PIPE_SPEED;
 
       // Remove pipes that are off screen
       if (pipe.x + PHYSICS.PIPE_WIDTH < 0) {
-        pipes.splice(i, 1);
+        pipes.splice(j, 1);
         continue;
       }
 
@@ -310,26 +315,14 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     }
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw clouds
+    // Draw clouds (simplified for performance)
     ctx.fillStyle = COLORS.CLOUD_WHITE;
-    ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
-    ctx.shadowBlur = 5;
     clouds.forEach(cloud => {
-      // Draw cloud as overlapping circles
+      // Draw cloud as single ellipse for better performance
       ctx.beginPath();
-      ctx.arc(cloud.x, cloud.y, cloud.size * 0.6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(cloud.x + cloud.size * 0.4, cloud.y, cloud.size * 0.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(cloud.x - cloud.size * 0.4, cloud.y, cloud.size * 0.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(cloud.x, cloud.y - cloud.size * 0.3, cloud.size * 0.4, 0, Math.PI * 2);
+      ctx.ellipse(cloud.x, cloud.y, cloud.size * 0.8, cloud.size * 0.5, 0, 0, Math.PI * 2);
       ctx.fill();
     });
-    ctx.shadowBlur = 0;
 
     // Draw small grass ground (reduced height)
     const grassHeight = 30; // Reduced from GAME.GROUND_HEIGHT (70)
@@ -401,14 +394,6 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       ctx.beginPath();
       ctx.arc(0, 0, PHYSICS.BIRD_SIZE / 2, 0, Math.PI * 2);
       ctx.fill();
-      
-      // Bird glow effect (optional for fallback)
-      ctx.shadowColor = '#fbbf24';
-      ctx.shadowBlur = 10;
-      ctx.beginPath();
-      ctx.arc(0, 0, PHYSICS.BIRD_SIZE / 2, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
       
       // Bird eye (optional for fallback)
       ctx.fillStyle = '#000';

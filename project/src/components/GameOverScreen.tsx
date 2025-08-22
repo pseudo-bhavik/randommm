@@ -50,11 +50,9 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({
   // Generate Farcaster Frame URL
   React.useEffect(() => {
     if (address && totalTokens > 0) {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      if (supabaseUrl) {
-        const frameUrl = `${supabaseUrl}/functions/v1/flappy-frame?score=${score}&multiplier=${multiplier}&address=${address}`;
-        setFarcasterFrameUrl(frameUrl);
-      }
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+      const frameUrl = `${baseUrl}/api/frame?score=${score}&multiplier=${multiplier}&address=${address}`;
+      setFarcasterFrameUrl(frameUrl);
     }
   }, [address, score, multiplier, totalTokens]);
 
